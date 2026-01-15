@@ -1,0 +1,15 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Purchase Requisition Header'
+define root view entity ZMM_I_PrHeader
+  as select from I_PurchaseRequisitionAPI01
+  composition [0..*] of ZMM_I_PrItem as _Item //on _Item.PurchaseRequisition = $projection.PurchaseRequisition
+  //association [0..*] to ZMM_I_PrItem as _Item on _Item.PurchaseRequisition = $projection.PurchaseRequisition
+{
+  key PurchaseRequisition,
+      PurReqnDescription,
+      PurchaseRequisitionType,
+      LastChangeDateTime,
+      /* Associations */
+      _Item
+}

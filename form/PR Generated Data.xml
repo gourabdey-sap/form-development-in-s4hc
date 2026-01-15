@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Form>
+   <Header>
+      <PurchaseRequisition>Ego ille</PurchaseRequisition>
+      <PurReqnDescription/>
+      <PurchaseRequisitionType/>
+      <LastChangeDateTime>20040606T101010</LastChangeDateTime>
+      <_Item>
+         <Item>
+            <PurchaseRequisition/>
+            <PurchaseRequisitionItem/>
+            <Material>Si manu vacuas</Material>
+            <ProductName>Apros tres et quidem</ProductName>
+            <MaterialGroup/>
+            <PurchasingDocumentCategory/>
+            <RequestedQuantity>Mirum est</RequestedQuantity>
+            <BaseUnit>Lic</BaseUnit>
+            <Plant/>
+            <OrderedQuantity/>
+            <CreationTime/>
+            <Supplier/>
+            <RequisitionerName/>
+            <CreatedByUser/>
+            <StorageLocation/>
+         </Item>
+      </_Item>
+   </Header>
+</Form>

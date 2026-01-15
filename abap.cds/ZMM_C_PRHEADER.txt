@@ -1,0 +1,17 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Purchase Requisition Header'
+@ObjectModel.supportedCapabilities: [ #OUTPUT_FORM_DATA_PROVIDER ]
+define root view entity ZMM_C_PrHeader
+  provider contract transactional_query
+  as projection on ZMM_I_PrHeader
+  //  association [0..*] to ZMM_C_PrItem as _Item on _Item.PurchaseRequisition = $projection.PurchaseRequisition
+{
+  key     PurchaseRequisition,
+          PurReqnDescription,
+          PurchaseRequisitionType,
+          LastChangeDateTime,
+          @ObjectModel.virtualElementCalculatedBy: 'ABAP:ZCL_MM_PR_FORM'
+  virtual Attachment : abap.rawstring( 0 ),
+          /* Associations */
+          _Item : redirected to composition child ZMM_C_PrItem
+}

@@ -1,0 +1,22 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Purchase Requisition Item'
+define view entity ZMM_C_PrItem
+  as projection on ZMM_I_PrItem
+{
+  key PurchaseRequisition,
+  key PurchaseRequisitionItem,
+      Material,
+      _Product._Text[1:Language=$session.system_language].ProductName,
+      MaterialGroup,
+      PurchasingDocumentCategory,
+      RequestedQuantity,
+      BaseUnit,
+      Plant,
+      OrderedQuantity,
+      CreationTime,
+      Supplier,
+      RequisitionerName,
+      CreatedByUser,
+      StorageLocation,
+      _Header : redirected to parent ZMM_C_PrHeader
+}
