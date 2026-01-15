@@ -1,0 +1,99 @@
+CLASS zcl_mm_pr_form DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    INTERFACES if_sadl_exit_calc_element_read.
+    CLASS-METHODS:
+      get_pdf
+        IMPORTING
+                  im_v_pr         TYPE zmm_c_prheader-purchaserequisition
+        RETURNING VALUE(rt_v_pdf) TYPE xstring
+        RAISING
+                  cx_fp_fdp_error
+                  cx_fp_form_reader
+                  cx_fp_ads_util.
+    CLASS-DATA: mc_duplicate_call TYPE abap_boolean.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_mm_pr_form IMPLEMENTATION.
+
+  METHOD if_sadl_exit_calc_element_read~calculate.
+
+    DATA:
+      lt_pr_header TYPE STANDARD TABLE OF zmm_c_prheader INITIAL SIZE 0,
+      ls_pr_header TYPE zmm_c_prheader.
+
+    lt_pr_header = CORRESPONDING #( it_original_data ).
+
+    LOOP AT lt_pr_header ASSIGNING FIELD-SYMBOL(<fs_s_header>).
+
+      "Is attachment required
+      IF line_exists( it_requested_calc_elements[ table_line = 'ATTACHMENT' ] ) AND
+          mc_duplicate_call IS INITIAL.
+        TRY.
+
+            <fs_s_header>-attachment = get_pdf( <fs_s_header>-purchaserequisition ).
+
+          CATCH cx_fp_fdp_error cx_fp_form_reader cx_fp_ads_util INTO DATA(lx_data).
+            DATA(lv_message) = lx_data->get_text( ).
+
+            "handle exception
+        ENDTRY.
+      ENDIF.
+
+      <fs_s_header>-filename = |{ <fs_s_header>-purchaserequisition ALPHA = OUT }_output.pdf|.
+      <fs_s_header>-mimetype = 'application/pdf'.
+
+    ENDLOOP.
+
+    ct_calculated_data = CORRESPONDING #( lt_pr_header ).
+
+  ENDMETHOD.
+
+  METHOD if_sadl_exit_calc_element_read~get_calculation_info.
+    APPEND to_upper( 'PurchaseRequisition' ) TO et_requested_orig_elements.
+  ENDMETHOD.
+
+  METHOD get_pdf.
+
+    mc_duplicate_call = abap_true.
+
+    DATA(lo_fdp_api) = cl_fp_fdp_services=>get_instance(
+      iv_max_depth          = 1
+      iv_service_definition = `ZMM_PR_FORM_DATA` ).
+
+    DATA(lt_keys)    = lo_fdp_api->get_keys( ).
+
+    lt_keys[ name = 'PURCHASEREQUISITION' ]-value = im_v_pr.
+
+    DATA(lv_data) = lo_fdp_api->read_to_xml_v2(
+      it_select = lt_keys
+    ).
+
+    DATA(lv_string) = cl_abap_conv_codepage=>create_in( )->convert( lv_data ).
+
+    DATA(lv_xml) = lo_fdp_api->get_xsd_v2( ).
+
+    DATA(lv_string2) = cl_abap_conv_codepage=>create_in( )->convert( lv_xml ).
+
+    DATA(lo_reader) = cl_fp_form_reader=>create_form_reader( `ZMM_PR_OUTPUT` ).
+
+    DATA(ls_layout) = lo_reader->get_layout( ).
+
+    cl_fp_ads_util=>render_pdf( EXPORTING iv_xml_data   = lv_data
+                                          iv_xdp_layout = ls_layout
+                                          iv_locale     = 'en_US'
+                                IMPORTING ev_pdf        = rt_v_pdf
+                                         ).
+
+    mc_duplicate_call = abap_false.
+
+  ENDMETHOD.
+
+ENDCLASS.
