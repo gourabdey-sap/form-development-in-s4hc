@@ -1,0 +1,6 @@
+@EndUserText.label: 'PR Form Data Provider'
+@ObjectModel.leadingEntity.name: 'ZMM_C_PRHEADER'
+define service ZMM_PR_FORM_DATA {
+  expose ZMM_C_PrHeader as Header;
+  expose ZMM_C_PrItem   as Item;
+}
